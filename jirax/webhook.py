@@ -241,13 +241,14 @@ class UserCreatedEvent(UserEvent):
 class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
     """An issue event.
 
-    :param issue_event_type: the issue event type name.
+    :param issue_event_type:
+        the issue event type name if any, otherwise `None`.
     :type issue_event_type: `str`
     """
 
     def __init__(self, *poargs, issue_event_type, **kwargs):
         """Initialize this instance."""
-        check_type(issue_event_type, str)
+        check_type(issue_event_type, (str, type(None)))
         super().__init__(*poargs, **kwargs)
         self.__issue_event_type = issue_event_type
 
@@ -257,14 +258,14 @@ class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
 
     @property
     def issue_event_type(self):  # noqa: D401
-        """The issue event type name."""
+        """The issue event type name if any, otherwise `None`."""
         return self.__issue_event_type
 
     @classmethod
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
         mover.move('issue_event_type', source_name='issue_event_type_name',
-                   type=str)
+                   type=str, required=False)
 
 
 class IssueCreatedEvent(IssueEvent):
