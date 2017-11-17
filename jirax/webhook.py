@@ -237,6 +237,10 @@ class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
                    type=str)
 
 
+class IssueCreatedEvent(IssueEvent):
+    """An issue was created."""
+
+
 class IssueUpdatedEvent(IssueEvent, WithComment, FromRaw, CtorRepr):
     """An issue updated event.
 
@@ -268,6 +272,10 @@ class IssueUpdatedEvent(IssueEvent, WithComment, FromRaw, CtorRepr):
                    filter=Change.from_raw, required=False)
 
 
+class IssueDeletedEvent(IssueEvent):
+    """An issue was deleted."""
+
+
 class CommentEvent(WebhookEvent, WithComment):
     """A comment event."""
 
@@ -285,8 +293,10 @@ class CommentDeletedEvent(CommentEvent):
 
 
 KNOWN_WEBHOOK_EVENTS = {
-        'jira:issue_updated': IssueUpdatedEvent,
         'user_created': UserCreatedEvent,
+        'jira:issue_created': IssueCreatedEvent,
+        'jira:issue_updated': IssueUpdatedEvent,
+        'jira:issue_deleted': IssueDeletedEvent,
         'comment_created': CommentCreatedEvent,
         'comment_updated': CommentUpdatedEvent,
         'comment_deleted': CommentDeletedEvent,
