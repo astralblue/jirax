@@ -161,6 +161,35 @@ class WithIssue(FromRaw, CtorRepr):
                    filter=raw_to_jira_resource(Issue))
 
 
+class WithComment(FromRaw, CtorRepr):
+    """Mix-in for webhook events with an issue comment.
+
+    :param comment: the Jira issue comment.
+    :type comment: `~jira.resources.Comment`
+    """
+
+    def __init__(self, *poargs, comment, **kwargs):
+        """Initialize this instance."""
+        check_type(comment, Comment)
+        super().__init__(*poargs, **kwargs)
+        self.__comment = comment
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(comment=self.__comment)
+
+    @property
+    def comment(self):  # noqa: D401
+        """The Jira issue comment."""
+        return self.__comment
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('comment', type=dict,
+                   filter=raw_to_jira_resource(Comment))
+
+
 class UserEvent(WebhookEvent, WithUser):
     """A user event."""
 
@@ -238,9 +267,18 @@ class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
                    filter=raw_to_jira_resource(Comment))
 
 
+class CommentEvent(WebhookEvent, WithComment):
+    """A comment event."""
+
+
+class CommentCreatedEvent(CommentEvent):
+    """A comment was created."""
+
+
 KNOWN_WEBHOOK_EVENTS = {
         'jira:issue_updated': IssueUpdatedEvent,
         'user_created': UserCreatedEvent,
+        'comment_created': CommentCreatedEvent,
 }
 
 
