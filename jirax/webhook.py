@@ -132,6 +132,35 @@ class WithUser(FromRaw, CtorRepr):
                    filter=raw_to_jira_resource(User))
 
 
+class WithIssue(FromRaw, CtorRepr):
+    """Mix-in for webhook events with a Jira issue.
+
+    :param issue: the Jira issue.
+    :type issue: `~jira.resources.Issue`
+    """
+
+    def __init__(self, *poargs, issue, **kwargs):
+        """Initialize this instance."""
+        check_type(issue, Issue)
+        super().__init__(*poargs, **kwargs)
+        self.__issue = issue
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(issue=self.__issue)
+
+    @property
+    def issue(self):  # noqa: D401
+        """The Jira issue issue."""
+        return self.__issue
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('issue', type=dict,
+                   filter=raw_to_jira_resource(Issue))
+
+
 class UserEvent(WebhookEvent, WithUser):
     """A user event."""
 
@@ -140,47 +169,55 @@ class UserCreatedEvent(UserEvent):
     """A user was created."""
 
 
-class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
-    """An issue updated event.
+class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
+    """An issue event.
 
-    :param issue: the updated issue.
-    :type issue: `~jira.resources.Issue`
     :param issue_event_type: the issue event type name.
     :type issue_event_type: `str`
+    """
+
+    def __init__(self, *poargs, issue_event_type, **kwargs):
+        """Initialize this instance."""
+        check_type(issue_event_type, str)
+        super().__init__(*poargs, **kwargs)
+        self.__issue_event_type = issue_event_type
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(issue_event_type=self.__issue_event_type)
+
+    @property
+    def issue_event_type(self):  # noqa: D401
+        """The issue event type name."""
+        return self.__issue_event_type
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('issue_event_type', source_name='issue_event_type_name',
+                   type=str)
+
+
+class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
+    """An issue updated event.
+
     :param change: what has changed in the issue.
     :type change: `Change`
     :param comment: comment if available, otherwise `None`.
     :type comment: `~jira.resources.Comment`
     """
 
-    def __init__(self, *poargs, issue, issue_event_type, change, comment,
-                 **kwargs):
+    def __init__(self, *poargs, change, comment, **kwargs):
         """Initialize this instance."""
-        check_type(issue, Issue)
-        check_type(issue_event_type, str)
         check_type(change, Change)
         check_type(comment, (Comment, 'NoneType'))
         super().__init__(*poargs, **kwargs)
-        self.__issue = issue
-        self.__issue_event_type = issue_event_type
         self.__change = change
         self.__comment = comment
 
     def _collect_repr_args(self, poargs, kwargs):
         super()._collect_repr_args(poargs, kwargs)
-        kwargs.update(issue=self.__issue, change=self.__change,
-                      issue_event_type=self.__issue_event_type,
-                      comment=self.__comment)
-
-    @property
-    def issue(self):  # noqa: D401
-        """The updated issue."""
-        return self.__issue
-
-    @property
-    def issue_event_type(self):  # noqa: D401
-        """The issue event type name."""
-        return self.__issue_event_type
+        kwargs.update(change=self.__change, comment=self.__comment)
 
     @property
     def change(self):  # noqa: D401
@@ -195,9 +232,6 @@ class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
     @classmethod
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
-        mover.move('issue', type=Mapping, filter=raw_to_jira_resource(Issue))
-        mover.move('issue_event_type', source_name='issue_event_type_name',
-                   type=str)
         mover.move('change', source_name='changelog', type=Mapping,
                    filter=Change.from_raw)
         mover.move('comment', required=False, type=Mapping,
