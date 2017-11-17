@@ -209,7 +209,7 @@ class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
 
     def __init__(self, *poargs, change, comment, **kwargs):
         """Initialize this instance."""
-        check_type(change, Change)
+        check_type(change, (Change, 'NoneType'))
         check_type(comment, (Comment, 'NoneType'))
         super().__init__(*poargs, **kwargs)
         self.__change = change
@@ -221,7 +221,7 @@ class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
 
     @property
     def change(self):  # noqa: D401
-        """What has changed in the issue."""
+        """What has changed in the issue, if any; otherwise `None`."""
         return self.__change
 
     @property
@@ -233,7 +233,7 @@ class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
         mover.move('change', source_name='changelog', type=Mapping,
-                   filter=Change.from_raw)
+                   filter=Change.from_raw, required=False)
         mover.move('comment', required=False, type=Mapping,
                    filter=raw_to_jira_resource(Comment))
 
