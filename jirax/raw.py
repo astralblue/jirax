@@ -110,7 +110,7 @@ class InvalidRawFieldType(InvalidRawField):
         return self.__value
 
     @property
-    def type(self):  # noqa: D401
+    def type(self):  # noqa: D401,D402
         """The expected type(s) or their name(s)."""
         return self.__type
 
