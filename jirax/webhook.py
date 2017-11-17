@@ -75,6 +75,7 @@ class WebhookEvent(FromRaw, CtorRepr):
     def _collect_repr_args(self, poargs, kwargs):
         super()._collect_repr_args(poargs, kwargs)
         kwargs.update(timestamp=self.__timestamp, type=self.__type)
+
     @property
     def timestamp(self):  # noqa: D401
         """The timestamp."""

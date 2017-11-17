@@ -349,10 +349,12 @@ def raw_to_jira_resource(type, options={}, session=ResilientSession):
     """
     type_ = type
     from builtins import type
+
     def converter(raw):
         try:
             return type_(options=options, session=session, raw=raw)
         except Exception as e:
             raise RawFieldValueError("invalid Jira {}"
                                      .format(type_.__name__)) from e
+
     return converter

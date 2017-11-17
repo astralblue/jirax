@@ -11,6 +11,7 @@ from .util import check_type
 
 logger = LoggerProxy(default_logger=getLogger(__name__))
 
+
 class InvalidChange(InvalidRawData):
     """Jira issue changelog is invalid."""
 
