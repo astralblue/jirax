@@ -14,18 +14,18 @@ logger = LoggerProxy(default_logger=logging.getLogger(__name__))
 
 
 class InvalidRawData(CtorRepr, Exception, metaclass=ABCMeta):
-    """A raw data is invalid."""
+    """A raw data is invalid.
+
+    :param raw: the offending raw data.
+    :type raw: `~collections.abc.Mapping`
+    :param kind: the kind of raw data.
+    :type kind: `str`
+    """
 
     KIND = "data"
 
     def __init__(self, *poargs, raw, kind="", **kwargs):
-        """Initialize this instance.
-
-        :param raw: the offending raw data.
-        :type raw: `~collections.abc.Mapping`
-        :param kind: the kind of raw data.
-        :type kind: `str`
-        """
+        """Initialize this instance."""
         check_type(kind, str)
         super().__init__(*poargs, **kwargs)
         self.__raw = raw
@@ -53,14 +53,14 @@ class InvalidRawData(CtorRepr, Exception, metaclass=ABCMeta):
 
 
 class InvalidRawField(InvalidRawData):
-    """A raw field is invalid."""
+    """A raw field is invalid.
+
+    :param name: the name of the offending field.
+    :type name: `str`
+    """
 
     def __init__(self, *poargs, name, **kwargs):
-        """Initialize this instance.
-
-        :param name: the name of the offending field.
-        :type name: `str`
-        """
+        """Initialize this instance."""
         check_type(name, str)
         super().__init__(*poargs, **kwargs)
         self.__name = name
@@ -88,14 +88,14 @@ class MissingRawField(InvalidRawField):
 
 
 class InvalidRawFieldType(InvalidRawField):
-    """A raw field is of a wrong type."""
+    """A raw field is of a wrong type.
+
+    :param value: the offending field value.
+    :param type: the expected type(s).
+    """
 
     def __init__(self, *poargs, value, type, **kwargs):
-        """Initialize this instance.
-
-        :param value: the offending field value.
-        :param type: the expected type(s).
-        """
+        """Initialize this instance."""
         super().__init__(*poargs, **kwargs)
         self.__value = value
         self.__type = type
@@ -131,13 +131,13 @@ class RawFieldValueError(RuntimeError):
 
 
 class InvalidRawFieldValue(InvalidRawField):
-    """A raw field value is invalid."""
+    """A raw field value is invalid.
+
+    :param value: the offending field value.
+    """
 
     def __init__(self, *poargs, value, **kwargs):
-        """Initialize this instance.
-
-        :param value: the offending field value.
-        """
+        """Initialize this instance."""
         super().__init__(*poargs, **kwargs)
         self.__value = value
 
@@ -157,14 +157,14 @@ class InvalidRawFieldValue(InvalidRawField):
 
 
 class ExtraRawFields(InvalidRawData):
-    """Raw data has unexpected fields."""
+    """Raw data has unexpected fields.
+
+    :param fields: the extra field names.
+    :type fields: `~collections.abc.Iterable` of `str`
+    """
 
     def __init__(self, *poargs, fields, **kwargs):
-        """Initialize this instance.
-
-        :param fields: the extra field names.
-        :type fields: `~collections.abc.Iterable` of `str`
-        """
+        """Initialize this instance."""
         check_type(fields, Iterable)
         super().__init__(*poargs, **kwargs)
         self.__fields = frozenset(fields)
@@ -182,18 +182,18 @@ class ExtraRawFields(InvalidRawData):
 
 
 class RawFieldMover:
-    """Move raw fields."""
+    """Move raw fields.
+
+    :param kind: the kind of raw source data.
+    :type kind: `str`
+    :param source: the raw source data.
+    :type source: `~collections.abc.Mapping`
+    :param target: where to move the fields.
+    :type target: `~collections.abc.MutableMapping`
+    """
 
     def __init__(self, *poargs, kind, source, target, **kwargs):
-        """Initialize this instance.
-
-        :param kind: the kind of raw source data.
-        :type kind: `str`
-        :param source: the raw source data.
-        :type source: `~collections.abc.Mapping`
-        :param target: where to move the fields.
-        :type target: `~collections.abc.MutableMapping`
-        """
+        """Initialize this instance."""
         check_type(kind, str)
         check_type(source, Mapping)
         check_type(target, MutableMapping)
@@ -291,17 +291,17 @@ class RawFieldMover:
 
 
 class FromRaw(CtorRepr):
-    """A mix-in for constructing objects from raw data."""
+    """A mix-in for constructing objects from raw data.
+
+    :param extras: extra, unparsed raw fields.
+    :type extras: `~collections.abc.Mapping`
+    """
 
     KIND = "data"
     """The kind of raw data."""
 
     def __init__(self, *poargs, extras={}, **kwargs):
-        """Initialize this instance.
-
-        :param extras: extra, unparsed raw fields.
-        :type extras: `~collections.abc.Mapping`
-        """
+        """Initialize this instance."""
         check_type(extras, Mapping)
         super().__init__(*poargs, **kwargs)
         self.__extras = extras

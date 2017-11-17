@@ -23,16 +23,16 @@ class EmptyChange(RawFieldValueError):
 
 
 class DuplicateField(RawFieldValueError):
-    """The same field occurred more than once in a change."""
+    """The same field occurred more than once in a change.
+
+    :param first: the first value, i.e. seen previously.
+    :type first: `FieldChange`
+    :param second: the second value, i.e. trying to replace *second*.
+    :type second: `FieldChange`
+    """
 
     def __init__(self, *poargs, first, second, **kwargs):
-        """Initialize this instance.
-
-        :param first: the first value, i.e. seen previously.
-        :type first: `FieldChange`
-        :param second: the second value, i.e. trying to replace *second*.
-        :type second: `FieldChange`
-        """
+        """Initialize this instance."""
         check_type(first, FieldChange)
         check_type(second, FieldChange)
         assert first.id == second.id
@@ -62,18 +62,18 @@ class DuplicateField(RawFieldValueError):
 
 
 class Change(FromRaw, CtorRepr):
-    """Jira issue changelog entry."""
+    """Jira issue changelog entry.
+
+    :param id: changelog entry ID.
+    :type id: `int`
+    :param fields: fields in the changelog entry, keyed by their field ID.
+    :type field: `~collections.abc.Mapping`
+    """
 
     KIND = "changelog entry"
 
     def __init__(self, *poargs, id, fields, **kwargs):
-        """Initialize this instance.
-
-        :param id: changelog entry ID.
-        :type id: `int`
-        :param fields: fields in the changelog entry, keyed by their field ID.
-        :type field: `~collections.abc.Mapping`
-        """
+        """Initialize this instance."""
         check_type(id, int)
         check_type(fields, Mapping)
         super().__init__(*poargs, **kwargs)
@@ -122,22 +122,22 @@ class InvalidFieldChange(InvalidRawData):
 
 
 class FieldChange(FromRaw, CtorRepr):
-    """Jira issue field change."""
+    """Jira issue field change.
+
+    :param id: the field ID.
+    :type id: `str`
+    :param type: the field type string.
+    :type type: `str`
+    :param old: the old field value.
+    :type old: `FieldValue`
+    :param new: the new field value.
+    :type new: `FieldValue`
+    """
 
     KIND = "issue field change"
 
     def __init__(self, *poargs, name, id, type, old, new, **kwargs):
-        """Initialize this instance.
-
-        :param id: the field ID.
-        :type id: `str`
-        :param type: the field type string.
-        :type type: `str`
-        :param old: the old field value.
-        :type old: `FieldValue`
-        :param new: the new field value.
-        :type new: `FieldValue`
-        """
+        """Initialize this instance."""
         type_ = type
         from builtins import type
         check_type(name, str)
@@ -205,14 +205,14 @@ class FieldChange(FromRaw, CtorRepr):
 
 
 class FieldValue(CtorRepr):
-    """A Jira issue field value."""
+    """A Jira issue field value.
+
+    :param raw: the raw, uncooked field value (may be `None`).
+    :param str: the field value as a string (may be `None`).
+    """
 
     def __init__(self, *poargs, raw, str, **kwargs):
-        """Initialize this instance.
-
-        :param raw: the raw, uncooked field value (may be `None`).
-        :param str: the field value as a string (may be `None`).
-        """
+        """Initialize this instance."""
         super().__init__(*poargs, **kwargs)
         self.__raw = raw
         self.__str = str

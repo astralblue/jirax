@@ -55,19 +55,18 @@ class LoggerProxy:
     - One defined in the thread-local storage under the given *logger_name*;
     - One supplied as the *default_logger*; or
     - The root logger.
+
+    :param logger_name:
+        the thread-local storage attribute name that has the thread-local
+        logger.
+    :type logger_name: `str`
+    :param default_logger: the default logger to use.
+    :type default_logger: `~logging.Logger`
     """
 
     def __init__(self, *poargs, logger_name='logger', default_logger=None,
                  **kwargs):
-        """Initialize this instance.
-
-        :param logger_name:
-            the thread-local storage attribute name that has the thread-local
-            logger.
-        :type logger_name: `str`
-        :param default_logger: the default logger to use.
-        :type default_logger: `~logging.Logger`
-        """
+        """Initialize this instance."""
         super().__init__(*poargs, **kwargs)
         self.__logger_name = logger_name
         self.__default_logger = default_logger
