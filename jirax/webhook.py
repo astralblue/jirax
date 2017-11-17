@@ -8,7 +8,6 @@ from ctorrepr import CtorRepr
 from jira.resources import User, Issue, Comment
 
 from .changelog import Change
-from .debug import pp
 from .logging import LoggerProxy
 from .raw import FromRaw, InvalidRawData, raw_to_jira_resource
 from .util import check_type

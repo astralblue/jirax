@@ -1,7 +1,5 @@
 """Utilities."""
 
-from collections.abc import Iterable
-
 
 def is_of_type(value, expected_types):
     """Check if the given value is of an expected type.

@@ -7,7 +7,7 @@ import logging
 from ctorrepr import CtorRepr
 from jira.resilientsession import ResilientSession
 
-from .logging import NOTICE, LoggerProxy
+from .logging import LoggerProxy
 from .util import is_of_type, check_type, type_names
 
 logger = LoggerProxy(default_logger=logging.getLogger(__name__))

@@ -1,8 +1,6 @@
 """Jira webhook changelog."""
 
 from collections.abc import Mapping, Iterable
-from contextlib import contextmanager
-from functools import partial
 from logging import getLogger
 
 from ctorrepr import CtorRepr
