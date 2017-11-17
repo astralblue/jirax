@@ -85,7 +85,8 @@ class WebhookEvent(FromRaw, CtorRepr):
     def type(self):  # noqa: D401
         """The webhook event type string.
 
-        See [Jira webhook documentation](https://developer.atlassian.com/cloud/jira/software/webhooks/)
+        See [Jira webhook documentation]
+        (https://developer.atlassian.com/cloud/jira/software/webhooks/)
         for valid values.
         """
         return self.__type
