@@ -1,5 +1,5 @@
 Welcome to Python Jira Extended (jirax)'s documentation!
-======================================
+========================================================
 
 .. toctree::
    :maxdepth: 2
