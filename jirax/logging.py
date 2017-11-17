@@ -1,5 +1,7 @@
 """Logging helpers."""
 
+# TODO: This module is a candidate for refactoring.
+
 import logging
 from threading import local as tls
 

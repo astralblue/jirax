@@ -1,5 +1,7 @@
 """Debug helpers."""
 
+# TODO: Refactor out of jirax.
+
 from collections import namedtuple
 from fcntl import ioctl
 from pprint import pprint
