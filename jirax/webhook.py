@@ -8,6 +8,7 @@ from ctorrepr import CtorRepr
 from jira.resources import User, Issue, Comment
 
 from .changelog import Change
+from .issuelink import IssueLink
 from .logging import LoggerProxy
 from .raw import FromRaw, InvalidRawData, raw_to_jira_resource
 from .util import check_type
@@ -200,6 +201,35 @@ class WithComment(FromRaw, CtorRepr):
                    required=cls.COMMENT_REQUIRED)
 
 
+class WithIssueLink(FromRaw, CtorRepr):
+    """Mix-in for webhook events with a Jira issue link.
+
+    :param issue_link: the Jira issue link.
+    :type issue_link: `.issuelink.IssueLink`
+    """
+
+    def __init__(self, *poargs, issue_link, **kwargs):
+        """Initialize this instance."""
+        check_type(issue_link, IssueLink)
+        super().__init__(*poargs, **kwargs)
+        self.__issue_link = issue_link
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(issue_link=self.__issue_link)
+
+    @property
+    def issue_link(self):  # noqa: D401
+        """The Jira issue link."""
+        return self.__issue_link
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('issue_link', type=dict, source_name='issueLink',
+                   filter=IssueLink.from_raw)
+
+
 class UserEvent(WebhookEvent, WithUser):
     """A user event."""
 
@@ -292,6 +322,18 @@ class CommentDeletedEvent(CommentEvent):
     """A comment was deleted."""
 
 
+class IssueLinkEvent(WebhookEvent, WithIssueLink):
+    """An issue link event."""
+
+
+class IssueLinkCreatedEvent(IssueLinkEvent):
+    """An issue link was created."""
+
+
+class IssueLinkDeletedEvent(IssueLinkEvent):
+    """An issue link was deleted."""
+
+
 KNOWN_WEBHOOK_EVENTS = {
         'user_created': UserCreatedEvent,
         'jira:issue_created': IssueCreatedEvent,
@@ -300,6 +342,8 @@ KNOWN_WEBHOOK_EVENTS = {
         'comment_created': CommentCreatedEvent,
         'comment_updated': CommentUpdatedEvent,
         'comment_deleted': CommentDeletedEvent,
+        'issuelink_created': IssueLinkCreatedEvent,
+        'issuelink_deleted': IssueLinkDeletedEvent,
 }
 
 
