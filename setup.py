@@ -17,7 +17,8 @@ requirements = [
 
 setup_requirements = [
     'pytest-runner',
-    # TODO(astralblue): put setup requirements (distutils extensions, etc.) here
+    # TODO(astralblue): put setup requirements (distutils extensions, etc.)
+    # here
 ]
 
 test_requirements = [
@@ -28,7 +29,8 @@ test_requirements = [
 setup(
     name='jirax',
     version='0.1.0',
-    description="Python Jira Extended complements the official Python JIRA library with additional features and helpers.",
+    description="Python Jira Extended complements the official Python JIRA "
+                "library with additional features and helpers.",
     long_description=readme + '\n\n' + history,
     author="Eugene M. Kim",
     author_email='astralblue@gmail.com',
