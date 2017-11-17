@@ -38,7 +38,7 @@ class UnknownWebhookEventType(InvalidWebhookEvent):
         self.__type = type_
 
     @property
-    def type(self):
+    def type(self):  # noqa: D401
         """The offending webhook event type."""
         return self.__type
 
@@ -61,12 +61,12 @@ class WebhookEvent(FromRaw, CtorRepr):
         super()._collect_repr_args(poargs, kwargs)
         kwargs.update(timestamp=self.__timestamp, type=self.__type)
     @property
-    def timestamp(self):
+    def timestamp(self):  # noqa: D401
         """The timestamp."""
         return self.__timestamp
 
     @property
-    def type(self):
+    def type(self):  # noqa: D401
         """The webhook event type string.
 
         See [Jira webhook documentation](https://developer.atlassian.com/cloud/jira/software/webhooks/)
@@ -99,7 +99,7 @@ class WithUser(FromRaw, CtorRepr):
         kwargs.update(user=self.__user)
 
     @property
-    def user(self):
+    def user(self):  # noqa: D401
         """The Jira user."""
         return self.__user
 
@@ -132,17 +132,17 @@ class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
                       comment=self.__comment)
 
     @property
-    def issue(self):
+    def issue(self):  # noqa: D401
         """The updated issue."""
         return self.__issue
 
     @property
-    def issue_event_type(self):
+    def issue_event_type(self):  # noqa: D401
         """The issue event type name."""
         return self.__issue_event_type
 
     @property
-    def change(self):
+    def change(self):  # noqa: D401
         """What has changed in the issue."""
         return self.__change
 

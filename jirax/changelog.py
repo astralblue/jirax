@@ -38,12 +38,12 @@ class DuplicateField(RawFieldValueError):
         kwargs.update(first=self.__first, second=self.__second)
 
     @property
-    def first(self):
+    def first(self):  # noqa: D401
         """The first value seen."""
         return self.__first
 
     @property
-    def second(self):
+    def second(self):  # noqa: D401
         """The second value seen."""
         return self.__second
 
@@ -131,27 +131,27 @@ class FieldChange(FromRaw, CtorRepr):
                       old=self.__old, new=self.__new)
 
     @property
-    def name(self):
+    def name(self):  # noqa: D401
         """The field name."""
         return self.__name
 
     @property
-    def id(self):
+    def id(self):  # noqa: D401
         """The field ID."""
         return self.__id
 
     @property
-    def type(self):
+    def type(self):  # noqa: D401
         """The field type string."""
         return self.__type
 
     @property
-    def old(self):
+    def old(self):  # noqa: D401
         """The old value."""
         return self.__old
 
     @property
-    def new(self):
+    def new(self):  # noqa: D401
         """The new value."""
         return self.__new
 
@@ -189,12 +189,12 @@ class FieldValue(CtorRepr):
         kwargs.update(raw=self.__raw, str=self.__str)
 
     @property
-    def raw(self):
+    def raw(self):  # noqa: D401
         """The raw field value."""
         return self.__raw
 
     @property
-    def str(self):
+    def str(self):  # noqa: D401
         """The field value string."""
         return self.__str
 

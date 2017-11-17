@@ -29,12 +29,12 @@ class InvalidRawData(CtorRepr, Exception, metaclass=ABCMeta):
             kwargs.update(kind=self.__kind)
 
     @property
-    def raw(self):
+    def raw(self):  # noqa: D401
         """The offending raw data."""
         return self.__raw
 
     @property
-    def kind(self):
+    def kind(self):  # noqa: D401
         """The kind of raw data."""
         return self.__kind or self.KIND
 
@@ -55,7 +55,7 @@ class InvalidRawField(InvalidRawData):
         kwargs.update(name=self.__name)
 
     @property
-    def name(self):
+    def name(self):  # noqa: D401
         """The name of the missing field."""
         return self.__name
 
@@ -83,12 +83,12 @@ class InvalidRawFieldType(InvalidRawField):
         kwargs.update(value=self.__value, type=self.__type)
 
     @property
-    def value(self):
+    def value(self):  # noqa: D401
         """The wrongly typed field value."""
         return self.__value
 
     @property
-    def type(self):
+    def type(self):  # noqa: D401
         """The expected type(s) or their name(s)."""
         return self.__type
 
@@ -119,7 +119,7 @@ class InvalidRawFieldValue(InvalidRawField):
         kwargs.update(value=self.__value)
 
     @property
-    def value(self):
+    def value(self):  # noqa: D401
         """The offending field value."""
         return self.__value
 
@@ -142,7 +142,7 @@ class ExtraRawFields(InvalidRawData):
         self.__fields = frozenset(fields)
 
     @property
-    def fields(self):
+    def fields(self):  # noqa: D401
         """The extra field names found."""
         return self.__fields
 
@@ -175,22 +175,22 @@ class RawFieldMover:
         self.__remaining = dict(source)
 
     @property
-    def kind(self):
+    def kind(self):  # noqa: D401
         """The kind of raw source data."""
         return self.__kind
 
     @property
-    def source(self):
+    def source(self):  # noqa: D401
         """The raw source data."""
         return self.__source
 
     @property
-    def target(self):
+    def target(self):  # noqa: D401
         """Where to move the fields."""
         return self.__target
 
     @property
-    def remaining(self):
+    def remaining(self):  # noqa: D401
         """The remaining raw source data."""
         return self.__remaining
 
@@ -277,7 +277,7 @@ class FromRaw(CtorRepr):
             kwargs.update(extras=self.__extras)
 
     @property
-    def extras(self):
+    def extras(self):  # noqa: D401
         """Extra, unparsed raw fields."""
         return self.__extras
 
