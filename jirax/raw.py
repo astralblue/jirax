@@ -125,7 +125,7 @@ class InvalidRawFieldType(InvalidRawField):
 
 class RawFieldValueError(RuntimeError):
     """A raw field value is invalid.
-    
+
     Raw field value filters raise this exception if necessary.
     """
 

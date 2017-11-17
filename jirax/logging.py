@@ -50,7 +50,7 @@ class LoggerProxy:
     """Logger proxy.
 
     Proxy to the first logger defined in the following sequence:
-    
+
     - One defined in the thread-local storage under the given *logger_name*;
     - One supplied as the *default_logger*; or
     - The root logger.
