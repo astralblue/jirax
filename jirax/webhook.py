@@ -132,6 +132,14 @@ class WithUser(FromRaw, CtorRepr):
                    filter=raw_to_jira_resource(User))
 
 
+class UserEvent(WebhookEvent, WithUser):
+    """A user event."""
+
+
+class UserCreatedEvent(UserEvent):
+    """A user was created."""
+
+
 class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
     """An issue updated event.
 
@@ -194,10 +202,6 @@ class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
                    filter=Change.from_raw)
         mover.move('comment', required=False, type=Mapping,
                    filter=raw_to_jira_resource(Comment))
-
-
-class UserCreatedEvent(WebhookEvent, WithUser):
-    """A user was created."""
 
 
 KNOWN_WEBHOOK_EVENTS = {
