@@ -237,44 +237,35 @@ class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
                    type=str)
 
 
-class IssueUpdatedEvent(IssueEvent, FromRaw, CtorRepr):
+class IssueUpdatedEvent(IssueEvent, WithComment, FromRaw, CtorRepr):
     """An issue updated event.
 
     :param change: what has changed in the issue.
     :type change: `Change`
-    :param comment: comment if available, otherwise `None`.
-    :type comment: `~jira.resources.Comment`
     """
 
-    def __init__(self, *poargs, change, comment, **kwargs):
+    COMMENT_REQUIRED = False
+
+    def __init__(self, *poargs, change, **kwargs):
         """Initialize this instance."""
         check_type(change, (Change, 'NoneType'))
-        check_type(comment, (Comment, 'NoneType'))
         super().__init__(*poargs, **kwargs)
         self.__change = change
-        self.__comment = comment
 
     def _collect_repr_args(self, poargs, kwargs):
         super()._collect_repr_args(poargs, kwargs)
-        kwargs.update(change=self.__change, comment=self.__comment)
+        kwargs.update(change=self.__change)
 
     @property
     def change(self):  # noqa: D401
         """What has changed in the issue, if any; otherwise `None`."""
         return self.__change
 
-    @property
-    def comment(self):
-        """Comment if available, otherwise `None`."""
-        return self.__comment
-
     @classmethod
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
         mover.move('change', source_name='changelog', type=Mapping,
                    filter=Change.from_raw, required=False)
-        mover.move('comment', required=False, type=Mapping,
-                   filter=raw_to_jira_resource(Comment))
 
 
 class CommentEvent(WebhookEvent, WithComment):
