@@ -94,5 +94,5 @@ class LoggerProxy:
             if name == name.lower() and name.upper() in LEVEL_NAMES:
                 level = globals()[name.upper()]
                 return (lambda *poargs, **kwargs:
-                               logger.log(level, *poargs, **kwargs))
+                        logger.log(level, *poargs, **kwargs))
             raise
