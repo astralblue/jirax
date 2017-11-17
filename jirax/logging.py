@@ -1,3 +1,5 @@
+"""Logging helpers."""
+
 import logging
 from threading import local as tls
 
@@ -56,6 +58,15 @@ class LoggerProxy:
 
     def __init__(self, *poargs, logger_name='logger', default_logger=None,
                  **kwargs):
+        """Initialize this instance.
+
+        :param logger_name:
+            the thread-local storage attribute name that has the thread-local
+            logger.
+        :type logger_name: `str`
+        :param default_logger: the default logger to use.
+        :type default_logger: `~logging.Logger`
+        """
         super().__init__(*poargs, **kwargs)
         self.__logger_name = logger_name
         self.__default_logger = default_logger
@@ -70,6 +81,11 @@ class LoggerProxy:
                 return logging.getLogger()
 
     def __getattr__(self, name):
+        """Proxy attributes to the underlying logger.
+
+        If the given attribute is not found but matches one of the extended
+        level names in `LEVEL_NAMES`, synthesize and return a matching method.
+        """
         logger = self.__get_logger()
         try:
             return getattr(logger, name)

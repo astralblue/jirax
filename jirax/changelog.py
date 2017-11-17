@@ -1,3 +1,5 @@
+"""Jira webhook changelog."""
+
 from collections.abc import Mapping, Iterable
 from contextlib import contextmanager
 from functools import partial
@@ -25,6 +27,13 @@ class DuplicateField(RawFieldValueError):
     """The same field occurred more than once in a change."""
 
     def __init__(self, *poargs, first, second, **kwargs):
+        """Initialize this instance.
+
+        :param first: the first value, i.e. seen previously.
+        :type first: `FieldChange`
+        :param second: the second value, i.e. trying to replace *second*.
+        :type second: `FieldChange`
+        """
         check_type(first, FieldChange)
         check_type(second, FieldChange)
         assert first.id == second.id
@@ -48,6 +57,7 @@ class DuplicateField(RawFieldValueError):
         return self.__second
 
     def __str__(self):
+        """Return a nicely printable string representation of this instance."""
         return (super().__str__() +
                 ": {!r} versus {!r}".format(self.__first, self.__second))
 
@@ -58,6 +68,13 @@ class Change(FromRaw, CtorRepr):
     KIND = "changelog entry"
 
     def __init__(self, *poargs, id, fields, **kwargs):
+        """Initialize this instance.
+
+        :param id: changelog entry ID.
+        :type id: `int`
+        :param fields: fields in the changelog entry, keyed by their field ID.
+        :type field: `~collections.abc.Mapping`
+        """
         check_type(id, int)
         check_type(fields, Mapping)
         super().__init__(*poargs, **kwargs)
@@ -111,6 +128,17 @@ class FieldChange(FromRaw, CtorRepr):
     KIND = "issue field change"
 
     def __init__(self, *poargs, name, id, type, old, new, **kwargs):
+        """Initialize this instance.
+
+        :param id: the field ID.
+        :type id: `str`
+        :param type: the field type string.
+        :type type: `str`
+        :param old: the old field value.
+        :type old: `FieldValue`
+        :param new: the new field value.
+        :type new: `FieldValue`
+        """
         type_ = type
         from builtins import type
         check_type(name, str)
@@ -171,6 +199,7 @@ class FieldChange(FromRaw, CtorRepr):
         )
 
     def __str__(self):
+        """Return a nicely printable string representation of this instance."""
         return ("field {!r} (ID {!r}, type {!r}) value {} -> {}"
                 .format(self.__name, self.__id, self.__type,
                         self.__old, self.__new))
@@ -180,6 +209,11 @@ class FieldValue(CtorRepr):
     """A Jira issue field value."""
 
     def __init__(self, *poargs, raw, str, **kwargs):
+        """Initialize this instance.
+
+        :param raw: the raw, uncooked field value (may be `None`).
+        :param str: the field value as a string (may be `None`).
+        """
         super().__init__(*poargs, **kwargs)
         self.__raw = raw
         self.__str = str
@@ -199,4 +233,5 @@ class FieldValue(CtorRepr):
         return self.__str
 
     def __str__(self):
+        """Return a nicely printable string representation of this instance."""
         return "{!r} (string {!r})".format(self.__raw, self.__str)

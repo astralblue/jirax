@@ -1,3 +1,5 @@
+"""Raw data helpers."""
+
 from abc import ABCMeta, abstractmethod
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 import logging
@@ -17,6 +19,13 @@ class InvalidRawData(CtorRepr, Exception, metaclass=ABCMeta):
     KIND = "data"
 
     def __init__(self, *poargs, raw, kind="", **kwargs):
+        """Initialize this instance.
+
+        :param raw: the offending raw data.
+        :type raw: `~collections.abc.Mapping`
+        :param kind: the kind of raw data.
+        :type kind: `str`
+        """
         check_type(kind, str)
         super().__init__(*poargs, **kwargs)
         self.__raw = raw
@@ -39,6 +48,7 @@ class InvalidRawData(CtorRepr, Exception, metaclass=ABCMeta):
         return self.__kind or self.KIND
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return "raw {} {!r}".format(self.__kind or self.KIND, self.__raw)
 
 
@@ -46,6 +56,11 @@ class InvalidRawField(InvalidRawData):
     """A raw field is invalid."""
 
     def __init__(self, *poargs, name, **kwargs):
+        """Initialize this instance.
+
+        :param name: the name of the offending field.
+        :type name: `str`
+        """
         check_type(name, str)
         super().__init__(*poargs, **kwargs)
         self.__name = name
@@ -60,6 +75,7 @@ class InvalidRawField(InvalidRawData):
         return self.__name
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return super().__str__() + ": field {}".format(self.__name)
 
 
@@ -67,6 +83,7 @@ class MissingRawField(InvalidRawField):
     """A raw field is missing."""
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return super().__str__() + ": is missing"
 
 
@@ -74,6 +91,11 @@ class InvalidRawFieldType(InvalidRawField):
     """A raw field is of a wrong type."""
 
     def __init__(self, *poargs, value, type, **kwargs):
+        """Initialize this instance.
+
+        :param value: the offending field value.
+        :param type: the expected type(s).
+        """
         super().__init__(*poargs, **kwargs)
         self.__value = value
         self.__type = type
@@ -93,6 +115,7 @@ class InvalidRawFieldType(InvalidRawField):
         return self.__type
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return (super().__str__() +
                 ": value {!r} is an instance of {} "
                 "but should be an instance of: {}"
@@ -111,6 +134,10 @@ class InvalidRawFieldValue(InvalidRawField):
     """A raw field value is invalid."""
 
     def __init__(self, *poargs, value, **kwargs):
+        """Initialize this instance.
+
+        :param value: the offending field value.
+        """
         super().__init__(*poargs, **kwargs)
         self.__value = value
 
@@ -124,6 +151,7 @@ class InvalidRawFieldValue(InvalidRawField):
         return self.__value
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return (super().__str__() +
                 ": invalid field value {!r}".format(self.__value))
 
@@ -147,6 +175,7 @@ class ExtraRawFields(InvalidRawData):
         return self.__fields
 
     def __str__(self):
+        """Return a string that describes this exception."""
         return (super().__str__() +
                 ": found extra fields: " +
                 ", ".join(sorted(self.__fields)))
@@ -265,8 +294,14 @@ class FromRaw(CtorRepr):
     """A mix-in for constructing objects from raw data."""
 
     KIND = "data"
+    """The kind of raw data."""
 
     def __init__(self, *poargs, extras={}, **kwargs):
+        """Initialize this instance.
+
+        :param extras: extra, unparsed raw fields.
+        :type extras: `~collections.abc.Mapping`
+        """
         check_type(extras, Mapping)
         super().__init__(*poargs, **kwargs)
         self.__extras = extras
@@ -299,6 +334,19 @@ class FromRaw(CtorRepr):
 
 
 def raw_to_jira_resource(type, options={}, session=ResilientSession):
+    """Return a function that converts raw data into a Jira resource.
+
+    :param type:
+        the desired Jira resource type (a subclass of
+        `~jira.resources.Resource`).
+    :type type: `type`.
+    :param options: the options to pass to the resource constructor.
+    :type options: `~collections.abc.Mapping`
+    :param session: the requests session to pass to the resource constructor.
+    :type session: `~requests.sessions.Session`
+    :return: the converter function.
+    :rtype: `~collections.abc.Callable`
+    """
     type_ = type
     from builtins import type
     def converter(raw):

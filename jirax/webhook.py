@@ -1,3 +1,5 @@
+"""Jira webhook event."""
+
 from collections.abc import Mapping
 from datetime import datetime
 import logging
@@ -24,6 +26,7 @@ class MissingWebhookEventType(InvalidWebhookEvent):
     """Webhook event is missing the type tag."""
 
     def __str__(self):
+        """Return a nicely printable string representation of this instance."""
         return super().__str__() + ": type tag is missing"
 
 
@@ -31,6 +34,11 @@ class UnknownWebhookEventType(InvalidWebhookEvent):
     """Webhook event is of an unknown type."""
 
     def __init__(self, *poargs, type, **kwargs):
+        """Initialize this instance.
+
+        :param type: the offending webhook event type string.
+        :type type: `str`
+        """
         type_ = type
         from builtins import type
         check_type(type_, str)
@@ -43,6 +51,7 @@ class UnknownWebhookEventType(InvalidWebhookEvent):
         return self.__type
 
     def __str__(self):
+        """Return a nicely printable string representation of this instance."""
         return (super().__str__() +
                 ": unknown webhook event type {!r}".format(self.__type))
 
@@ -51,6 +60,13 @@ class WebhookEvent(FromRaw, CtorRepr):
     """A webhook event."""
 
     def __init__(self, *poargs, timestamp, type, **kwargs):
+        """Initialize this instance.
+
+        :param timestamp: the event timestamp.
+        :type timestamp: `~datetime.datetime`
+        :param type: the event type string.
+        :type type: `str`
+        """
         check_type(timestamp, datetime)
         check_type(type, str)
         super().__init__(*poargs, **kwargs)
@@ -90,6 +106,11 @@ class WithUser(FromRaw, CtorRepr):
     """Mix-in for webhook events with a Jira user."""
 
     def __init__(self, *poargs, user, **kwargs):
+        """Initialize this instance.
+
+        :param user: the Jira user.
+        :type user: `~jira.resources.User`
+        """
         check_type(user, User)
         super().__init__(*poargs, **kwargs)
         self.__user = user
@@ -115,6 +136,17 @@ class IssueUpdatedEvent(WebhookEvent, WithUser, FromRaw, CtorRepr):
 
     def __init__(self, *poargs, issue, issue_event_type, change, comment,
                  **kwargs):
+        """Initialize this instance.
+
+        :param issue: the updated issue.
+        :type issue: `~jira.resources.Issue`
+        :param issue_event_type: the issue event type name.
+        :type issue_event_type: `str`
+        :param change: what has changed in the issue.
+        :type change: `Change`
+        :param comment: comment if available, otherwise `None`.
+        :type comment: `~jira.resources.Comment`
+        """
         check_type(issue, Issue)
         check_type(issue_event_type, str)
         check_type(change, Change)
