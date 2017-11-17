@@ -164,13 +164,22 @@ class WithIssue(FromRaw, CtorRepr):
 class WithComment(FromRaw, CtorRepr):
     """Mix-in for webhook events with an issue comment.
 
-    :param comment: the Jira issue comment.
+    :param comment: the Jira issue comment, if any; otherwise `None`.
     :type comment: `~jira.resources.Comment`
+    """
+
+    COMMENT_REQUIRED = True
+    """Whether the comment is required.
+
+    Subclasses may override this.
     """
 
     def __init__(self, *poargs, comment, **kwargs):
         """Initialize this instance."""
-        check_type(comment, Comment)
+        if self.COMMENT_REQUIRED:
+            check_type(comment, Comment)
+        else:
+            check_type(comment, (Comment, 'NoneType'))
         super().__init__(*poargs, **kwargs)
         self.__comment = comment
 
@@ -180,14 +189,15 @@ class WithComment(FromRaw, CtorRepr):
 
     @property
     def comment(self):  # noqa: D401
-        """The Jira issue comment."""
+        """The Jira issue comment, if any; otherwise `None`."""
         return self.__comment
 
     @classmethod
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
         mover.move('comment', type=dict,
-                   filter=raw_to_jira_resource(Comment))
+                   filter=raw_to_jira_resource(Comment),
+                   required=cls.COMMENT_REQUIRED)
 
 
 class UserEvent(WebhookEvent, WithUser):
