@@ -276,6 +276,10 @@ class CommentCreatedEvent(CommentEvent):
     """A comment was created."""
 
 
+class CommentUpdatedEvent(CommentEvent):
+    """A comment was updated."""
+
+
 class CommentDeletedEvent(CommentEvent):
     """A comment was deleted."""
 
@@ -284,6 +288,7 @@ KNOWN_WEBHOOK_EVENTS = {
         'jira:issue_updated': IssueUpdatedEvent,
         'user_created': UserCreatedEvent,
         'comment_created': CommentCreatedEvent,
+        'comment_updated': CommentUpdatedEvent,
         'comment_deleted': CommentDeletedEvent,
 }
 
