@@ -29,7 +29,6 @@ def _add_level_names(names):
         cur = logging.getLevelName(name)
         if isinstance(cur, int):
             globals()[name] = cur
-            interval = cur - last
             divisor = len(undef) + 1
             for i, n in enumerate(undef, 1):
                 _add_level_name(last + (cur - last) * i // divisor, n)
