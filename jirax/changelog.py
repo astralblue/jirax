@@ -100,9 +100,10 @@ class Change(FromRaw, CtorRepr):
                 field = FieldChange.from_raw(item)
             except InvalidRawData as e:
                 raise RawFieldValueError from e
-            if field.id in fields:
-                raise DuplicateField(first=fields[field.id], second=field)
-            fields[field.id] = field
+            field_id = field.id or field.name
+            if field_id in fields:
+                raise DuplicateField(first=fields[field_id], second=field)
+            fields[field_id] = field
         if not fields:
             raise EmptyChange()
         return fields
@@ -124,7 +125,7 @@ class InvalidFieldChange(InvalidRawData):
 class FieldChange(FromRaw, CtorRepr):
     """Jira issue field change.
 
-    :param id: the field ID.
+    :param id: the field ID, if any; otherwise `None`.
     :type id: `str`
     :param type: the field type string.
     :type type: `str`
@@ -141,7 +142,7 @@ class FieldChange(FromRaw, CtorRepr):
         type_ = type
         from builtins import type
         check_type(name, str)
-        check_type(id, str)
+        check_type(id, (str, type(None)))
         check_type(type_, str)
         check_type(old, FieldValue)
         check_type(new, FieldValue)
@@ -164,7 +165,11 @@ class FieldChange(FromRaw, CtorRepr):
 
     @property
     def id(self):  # noqa: D401
-        """The field ID."""
+        """The field ID, if any.
+
+        Certain Jira fields such as ``WorklogId`` has only name and not an ID.
+        This ID is `None` in such cases.
+        """
         return self.__id
 
     @property
@@ -186,7 +191,7 @@ class FieldChange(FromRaw, CtorRepr):
     def _collect_ctor_args_from_raw(cls, mover):
         super()._collect_ctor_args_from_raw(mover)
         mover.move('name', source_name='field', type=str)
-        mover.move('id', source_name='fieldId', type=str)
+        mover.move('id', source_name='fieldId', type=str, required=False)
         mover.move('type', source_name='fieldtype', type=str)
         mover.target['old'] = FieldValue(
                 raw=mover.move('', source_name='from'),
