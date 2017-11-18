@@ -5,7 +5,7 @@ from datetime import datetime
 import logging
 
 from ctorrepr import CtorRepr
-from jira.resources import User, Issue, Comment
+from jira.resources import User, Issue, Worklog, Comment
 
 from .changelog import Change
 from .issuelink import IssueLink
@@ -307,6 +307,51 @@ class IssueDeletedEvent(IssueEvent):
     """An issue was deleted."""
 
 
+class IssueWorkLogUpdatedEvent(IssueUpdatedEvent):
+    """Work was logged on an issue."""
+
+
+class WorklogEvent(WebhookEvent, FromRaw, CtorRepr):
+    """A worklog event.
+
+    :param work_log: the worklog.
+    :type work_log: `~jira.resources.Worklog`
+    """
+
+    def __init__(self, *poargs, worklog, **kwargs):
+        """Initialize this instance."""
+        check_type(worklog, Worklog)
+        super().__init__(*poargs, **kwargs)
+        self.__worklog = worklog
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(worklog=self.__worklog)
+
+    @property
+    def worklog(self):  # noqa: D401
+        """The worklog."""
+        return self.__worklog
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('worklog', type=Mapping,
+                   filter=raw_to_jira_resource(Worklog))
+
+
+class WorklogCreatedEvent(WorklogEvent):
+    """A worklog was created."""
+
+
+class WorklogUpdatedEvent(WorklogEvent):
+    """A worklog was updated."""
+
+
+class WorklogDeletedEvent(WorklogEvent):
+    """A worklog was deleted."""
+
+
 class CommentEvent(WebhookEvent, WithComment):
     """A comment event."""
 
@@ -340,6 +385,10 @@ KNOWN_WEBHOOK_EVENTS = {
         'jira:issue_created': IssueCreatedEvent,
         'jira:issue_updated': IssueUpdatedEvent,
         'jira:issue_deleted': IssueDeletedEvent,
+        'jira:worklog_updated': IssueWorkLogUpdatedEvent,
+        'worklog_created': WorklogCreatedEvent,
+        'worklog_updated': WorklogUpdatedEvent,
+        'worklog_deleted': WorklogDeletedEvent,
         'comment_created': CommentCreatedEvent,
         'comment_updated': CommentUpdatedEvent,
         'comment_deleted': CommentDeletedEvent,
