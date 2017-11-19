@@ -5,7 +5,7 @@ from datetime import datetime
 import logging
 
 from ctorrepr import CtorRepr
-from jira.resources import User, Issue, Worklog, Comment
+from jira.resources import User, Issue, Worklog, Comment, Attachment
 
 from .changelog import Change
 from .issuelink import IssueLink
@@ -380,6 +380,43 @@ class IssueLinkDeletedEvent(IssueLinkEvent):
     """An issue link was deleted."""
 
 
+class AttachmentEvent(WebhookEvent, FromRaw, CtorRepr):
+    """An attachment event.
+
+    :param work_log: the attachment.
+    :type work_log: `~jira.resources.Attachment`
+    """
+
+    def __init__(self, *poargs, attachment, **kwargs):
+        """Initialize this instance."""
+        check_type(attachment, Attachment)
+        super().__init__(*poargs, **kwargs)
+        self.__attachment = attachment
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(attachment=self.__attachment)
+
+    @property
+    def attachment(self):  # noqa: D401
+        """The attachment."""
+        return self.__attachment
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('attachment', type=Mapping,
+                   filter=raw_to_jira_resource(Attachment))
+
+
+class AttachmentCreatedEvent(AttachmentEvent):
+    """An attachment was created."""
+
+
+class AttachmentDeletedEvent(AttachmentEvent):
+    """An attachment was deleted."""
+
+
 KNOWN_WEBHOOK_EVENTS = {
         'user_created': UserCreatedEvent,
         'jira:issue_created': IssueCreatedEvent,
@@ -394,6 +431,8 @@ KNOWN_WEBHOOK_EVENTS = {
         'comment_deleted': CommentDeletedEvent,
         'issuelink_created': IssueLinkCreatedEvent,
         'issuelink_deleted': IssueLinkDeletedEvent,
+        'attachment_created': AttachmentCreatedEvent,
+        'attachment_deleted': AttachmentDeletedEvent,
 }
 
 
