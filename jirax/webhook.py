@@ -5,7 +5,7 @@ from datetime import datetime
 import logging
 
 from ctorrepr import CtorRepr
-from jira.resources import User, Issue, Worklog, Comment, Attachment
+from jira.resources import User, Project, Issue, Worklog, Comment, Attachment
 
 from .changelog import Change
 from .issuelink import IssueLink
@@ -246,6 +246,47 @@ class UserDeletedEvent(UserEvent):
     """A user was deleted."""
 
 
+class ProjectEvent(WebhookEvent, FromRaw, CtorRepr):
+    """A project event.
+
+    :param work_log: the project.
+    :type work_log: `~jira.resources.Project`
+    """
+
+    def __init__(self, *poargs, project, **kwargs):
+        """Initialize this instance."""
+        check_type(project, Project)
+        super().__init__(*poargs, **kwargs)
+        self.__project = project
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(project=self.__project)
+
+    @property
+    def project(self):  # noqa: D401
+        """The project."""
+        return self.__project
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('project', type=Mapping,
+                   filter=raw_to_jira_resource(Project))
+
+
+class ProjectCreatedEvent(ProjectEvent):
+    """A project was created."""
+
+
+class ProjectUpdatedEvent(ProjectEvent):
+    """A project was updated."""
+
+
+class ProjectDeletedEvent(ProjectEvent):
+    """A project was deleted."""
+
+
 class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
     """An issue event.
 
@@ -429,6 +470,9 @@ KNOWN_WEBHOOK_EVENTS = {
         'user_created': UserCreatedEvent,
         'user_updated': UserUpdatedEvent,
         'user_deleted': UserDeletedEvent,
+        'project_created': ProjectCreatedEvent,
+        'project_updated': ProjectUpdatedEvent,
+        'project_deleted': ProjectDeletedEvent,
         'jira:issue_created': IssueCreatedEvent,
         'jira:issue_updated': IssueUpdatedEvent,
         'jira:issue_deleted': IssueDeletedEvent,
