@@ -238,6 +238,14 @@ class UserCreatedEvent(UserEvent):
     """A user was created."""
 
 
+class UserUpdatedEvent(UserEvent):
+    """A user was updated."""
+
+
+class UserDeletedEvent(UserEvent):
+    """A user was deleted."""
+
+
 class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
     """An issue event.
 
@@ -419,6 +427,8 @@ class AttachmentDeletedEvent(AttachmentEvent):
 
 KNOWN_WEBHOOK_EVENTS = {
         'user_created': UserCreatedEvent,
+        'user_updated': UserUpdatedEvent,
+        'user_deleted': UserDeletedEvent,
         'jira:issue_created': IssueCreatedEvent,
         'jira:issue_updated': IssueUpdatedEvent,
         'jira:issue_deleted': IssueDeletedEvent,
