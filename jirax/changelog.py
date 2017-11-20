@@ -84,11 +84,13 @@ class Change(FromRaw, CtorRepr):
         super()._collect_repr_args(poargs, kwargs)
         kwargs.update(id=self.__id, fields=self.__fields)
 
-    def id(self):
+    @property
+    def id(self):  # noqa: D401
         """Changelog identifier."""
         return self.__id
 
-    def fields(self):
+    @property
+    def fields(self):  # noqa: D401
         """Fields that have changed, keyed by Jira field ID string."""
         return self.__fields
 
