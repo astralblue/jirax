@@ -5,7 +5,8 @@ from datetime import datetime
 import logging
 
 from ctorrepr import CtorRepr
-from jira.resources import User, Project, Issue, Worklog, Comment, Attachment
+from jira.resources import (User, Project, Board, Issue, Worklog, Comment,
+                            Attachment)
 
 from .changelog import Change
 from .issuelink import IssueLink
@@ -287,6 +288,51 @@ class ProjectDeletedEvent(ProjectEvent):
     """A project was deleted."""
 
 
+class BoardEvent(WebhookEvent, FromRaw, CtorRepr):
+    """A board event.
+
+    :param work_log: the board.
+    :type work_log: `~jira.resources.Board`
+    """
+
+    def __init__(self, *poargs, board, **kwargs):
+        """Initialize this instance."""
+        check_type(board, Board)
+        super().__init__(*poargs, **kwargs)
+        self.__board = board
+
+    def _collect_repr_args(self, poargs, kwargs):
+        super()._collect_repr_args(poargs, kwargs)
+        kwargs.update(board=self.__board)
+
+    @property
+    def board(self):  # noqa: D401
+        """The board."""
+        return self.__board
+
+    @classmethod
+    def _collect_ctor_args_from_raw(cls, mover):
+        super()._collect_ctor_args_from_raw(mover)
+        mover.move('board', type=Mapping,
+                   filter=raw_to_jira_resource(Board))
+
+
+class BoardCreatedEvent(BoardEvent):
+    """A board was created."""
+
+
+class BoardUpdatedEvent(BoardEvent):
+    """A board was updated."""
+
+
+class BoardConfigChangedEvent(BoardEvent):
+    """Configuration of a board was changed."""
+
+
+class BoardDeletedEvent(BoardEvent):
+    """A board was deleted."""
+
+
 class IssueEvent(WebhookEvent, WithUser, WithIssue, FromRaw, CtorRepr):
     """An issue event.
 
@@ -473,6 +519,10 @@ KNOWN_WEBHOOK_EVENTS = {
         'project_created': ProjectCreatedEvent,
         'project_updated': ProjectUpdatedEvent,
         'project_deleted': ProjectDeletedEvent,
+        'board_created': BoardCreatedEvent,
+        'board_updated': BoardUpdatedEvent,
+        'board_configuration_changed': BoardConfigChangedEvent,
+        'board_deleted': BoardDeletedEvent,
         'jira:issue_created': IssueCreatedEvent,
         'jira:issue_updated': IssueUpdatedEvent,
         'jira:issue_deleted': IssueDeletedEvent,
